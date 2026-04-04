@@ -10,13 +10,12 @@ public static class ApplicationBuilderExtensions
         app.UseMiddleware<ErrorHandlingMiddleware>();
         app.UseMiddleware<RateLimitingMiddleware>();
 
-        if (app.Environment.IsDevelopment())
+        app.UseSwagger();
+        app.UseSwaggerUI(c =>
         {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
-
-        app.UseHttpsRedirection();
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "SolidShortener API V1");
+            c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
+        });
 
         app.UseRouting();
 
