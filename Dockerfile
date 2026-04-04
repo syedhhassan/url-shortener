@@ -7,7 +7,7 @@ COPY src/SolidShortener.Application/SolidShortener.Application.csproj src/SolidS
 COPY src/SolidShortener.Infrastructure/SolidShortener.Infrastructure.csproj src/SolidShortener.Infrastructure/
 COPY src/SolidShortener.Api/SolidShortener.Api.csproj src/SolidShortener.Api/
 
-RUN dotnet restore
+RUN dotnet restore src/SolidShortener.Api/SolidShortener.Api.csproj
 
 COPY src/ src/
 
