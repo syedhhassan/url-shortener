@@ -4,6 +4,7 @@ using SolidShortener.Application.Users.Commands;
 using SolidShortener.Application.Users.DTOs;
 using SolidShortener.Application.Users.Queries;
 using SolidShortener.Application.Users.Services.Interfaces;
+using SolidShortener.Domain.Entities;
 
 namespace SolidShortener.Application.Users.Services.Implementations;
 
@@ -22,6 +23,10 @@ public class UserService : IUserService
 
     public async Task<UserDTO> RegisterUserAsync(RegisterUserCommand command)
     {
+        var existing = await _userRepository.GetUserByEmailAsync(command.Email);
+        if (existing is not null)
+            throw new ConflictException("An account with this email already exists.");
+
         var user = new User
         (
             command.Name,
@@ -60,12 +65,12 @@ public class UserService : IUserService
 
         if (!_passwordHasher.VerifyPassword(query.Password, user.PasswordHash)) return null;
 
-        var token = _tokenGenerator.GenerateToken(UserMapper.ToDto(user));
+        var (token, expiresAt) = _tokenGenerator.GenerateToken(UserMapper.ToDto(user));
 
         return new AuthResultDTO
         {
             Token = token,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(60)
+            ExpiresAt = expiresAt
         };
     }
 }

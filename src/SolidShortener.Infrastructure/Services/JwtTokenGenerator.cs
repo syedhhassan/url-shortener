@@ -16,7 +16,7 @@ public class JwtTokenGenerator : ITokenGenerator
         _settings = options.Value;
     }
 
-    public string GenerateToken(UserDTO user)
+    public (string Token, DateTime ExpiresAt) GenerateToken(UserDTO user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(_settings.SecretKey);
@@ -33,6 +33,6 @@ public class JwtTokenGenerator : ITokenGenerator
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
         var token = tokenHandler.CreateToken(tokenDescriptor);
-        return tokenHandler.WriteToken(token);
+        return (tokenHandler.WriteToken(token), tokenDescriptor.Expires.Value);
     }
 }

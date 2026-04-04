@@ -14,12 +14,16 @@ public class UrlController : ControllerBase
     private readonly IUrlService _urlService;
     private readonly IVisitService _visitService;
     private readonly ICurrentUserService _currentUserService;
+    private readonly ILogger<UrlController> _logger;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
 
-    public UrlController(IUrlService urlService, IVisitService visitService, ICurrentUserService currentUserService)
+    public UrlController(IUrlService urlService, IVisitService visitService, ICurrentUserService currentUserService, ILogger<UrlController> logger, IServiceScopeFactory serviceScopeFactory)
     {
         _urlService = urlService;
         _visitService = visitService;
         _currentUserService = currentUserService;
+        _logger = logger;
+        _serviceScopeFactory = serviceScopeFactory;
     }
 
     [Authorize]
@@ -41,11 +45,23 @@ public class UrlController : ControllerBase
 
         if (response is null) return NotFound();
 
-        _ = _visitService.LogVisitAsync(new LogVisitCommand
+        _ = Task.Run(async () =>
         {
-            ShortCode = code,
-            IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown",
-            UserAgent = Request.Headers["User-Agent"].ToString()
+            using var scope = _serviceScopeFactory.CreateScope();
+            var visitService = scope.ServiceProvider.GetRequiredService<IVisitService>();
+            try
+            {
+                await visitService.LogVisitAsync(new LogVisitCommand
+                {
+                    ShortCode = code,
+                    IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown",
+                    UserAgent = Request.Headers["User-Agent"].ToString()
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to log visit for short code {ShortCode}", code);
+            }
         });
 
         return Redirect(response.LongUrl);
