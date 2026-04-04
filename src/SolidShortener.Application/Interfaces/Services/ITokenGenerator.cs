@@ -4,5 +4,5 @@ namespace SolidShortener.Application.Interfaces.Services;
 
 public interface ITokenGenerator
 {
-    string GenerateToken(UserDTO user);
+    (string Token, DateTime ExpiresAt) GenerateToken(UserDTO user);
 }

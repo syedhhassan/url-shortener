@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using SolidShortener.Domain.Entities;
 
 namespace SolidShortener.Api.Middlewares;
 
@@ -35,6 +36,7 @@ public class ErrorHandlingMiddleware
             KeyNotFoundException => HttpStatusCode.NotFound,
             UnauthorizedAccessException => HttpStatusCode.Forbidden,
             ArgumentException or InvalidOperationException => HttpStatusCode.BadRequest,
+            ConflictException => HttpStatusCode.Conflict,
             _ => HttpStatusCode.InternalServerError
         };
 
