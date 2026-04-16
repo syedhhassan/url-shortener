@@ -244,6 +244,17 @@ tests/
 
 ---
 
+## Observability
+
+Request metrics exposed via Prometheus and visualized in Grafana — tracking HTTP request duration, status codes, and endpoint-level throughput.
+
+<p align="center">
+  <img src="docs/screenshots/prometheus-targets.png" width="48%" />
+  <img src="docs/screenshots/grafana-dashboard.png" width="48%" />
+</p>
+
+---
+
 ## Author
 
 **Syed Hassan** — [GitHub](https://github.com/syedhhassan)
